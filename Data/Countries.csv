@@ -1,0 +1,50 @@
+code,name,format,example
+DE,Germany,11 digits,12345678901
+SE,Sweden,YYMMDDXXXX,8501011234
+NO,Norway,11 digits,12345678901
+UK,United Kingdom,2 letters + 6 digits + 1 letter,QQ123456C
+US,United States,XXX-XX-XXXX,123-45-6789
+CA,Canada,9 digits,123456789
+FR,France,13 digits,1234567890123
+ES,Spain,1 letter + 8 digits,X12345678
+NL,Netherlands,9 digits + 'B01',123456789B01
+CH,Switzerland,13 digits,7569217076983
+BE,Belgium,11 digits,85010112345
+FI,Finland,DDMMYY-XXXX,131052-308T
+IS,Iceland,DDMMYYXXXX,1201743399
+IT,Italy,16-character alphanumeric,RSSMRA85M01H501Z
+PL,Poland,10 digits,1234567890
+IE,Ireland,7 digits + 1 or 2 letters,1234567T
+AU,Australia,9 digits,123456782
+NZ,New Zealand,8-9 digits,123456789
+SG,Singapore,1 letter + 7 digits + 1 letter,S1234567D
+AT,Austria,9 digits,123456789
+CZ,Czech Republic,9 or 10 digits,1234567890
+PT,Portugal,9 digits,123456789
+HU,Hungary,10 digits,1234567890
+RO,Romania,13 digits,1234567890123
+LT,Lithuania,11 digits,39303136519
+LV,Latvia,11 digits,01010012345
+EE,Estonia,11 digits,38501010005
+LU,Luxembourg,13 digits,1985110912345
+SK,Slovakia,10 digits,1234567890
+SI,Slovenia,8 digits,12345678
+HR,Croatia,11 digits,12345678901
+GR,Greece,9 digits,123456789
+BG,Bulgaria,10 digits,1234567890
+CY,Cyprus,8 digits + 1 letter,12345678L
+MT,Malta,9 characters,1234567M
+TR,Turkey,11 digits,12345678901
+BR,Brazil,XXX.XXX.XXX-XX,123.456.789-09
+AR,Argentina,XX-XXXXXXXX-X,20-12345678-3
+MX,Mexico,13-character alphanumeric,GODE561231GR8
+CL,Chile,XX.XXX.XXX-X,12.345.678-5
+CN,China,18-character numeric,91350200747123456G
+IN,India,10-character alphanumeric,ABCDE1234F
+JP,Japan,12 digits,123456789012
+KR,South Korea,13 digits,9010101234567
+TH,Thailand,13 digits,1234567890123
+AE,United Arab Emirates,15-digit VAT number,100123456700003
+IL,Israel,9 digits,123456782
+ZA,South Africa,10 digits,1234567890
+HK,Hong Kong,8 characters,A123456(3)
