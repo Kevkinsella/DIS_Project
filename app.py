@@ -267,13 +267,5 @@ def get_highscores():
 
     return jsonify({"highscores": highscores})
 
-# if __name__ == "__main__":
-#     app.run(debug=True)
-
 if __name__ == "__main__":
-    try:
-        conn = get_db_connection()
-        print("✅ Successfully connected to the database!")
-        conn.close()
-    except Exception as e:
-        print("❌ Failed to connect:", e)
+    app.run(debug=True)
