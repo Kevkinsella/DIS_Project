@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TIN Universet 🌍</title>
+    <style>
+        .role-section, .form-section {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        #roleSelect, #employerMode {
+            margin-bottom: 15px;
+        }
+    </style>
+    <script>
+        const tinFormats = {{ tin_formats | tojson }};
+        const employers = {{ employers | tojson }};
+        const tinExamples = {{ tin_examples | tojson }};
+
+        function showFormForRole() {
+            const role = document.getElementById("roleSelect").value;
+            document.querySelectorAll('.role-section').forEach(el => el.style.display = 'none');
+            if (role) {
+                document.getElementById(role + "-section").style.display = "block";
+            }
+        }
+
+        function updateFormat() {
+            const country = document.getElementById("country").value;
+            const format = tinFormats[country] || "";
+            document.getElementById("formatDisplay").innerText = format ? `Format: ${format}` : "";
+            const example = generateSampleTIN(format);
+            document.getElementById("exampleDisplay").innerText = example ? `Eksempel: ${example}` : "";
+        }
+
+        function generateSampleTIN(format) {
+            if (!format) return "";
+            let sample = "";
+            for (let char of format) {
+                if (char === "#") {
+                    sample += Math.floor(Math.random() * 10);
+                } else if (char === "A") {
+                    sample += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                } else if (char === "?") {
+                    const pool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    sample += pool.charAt(Math.floor(Math.random() * pool.length));
+                } else {
+                    sample += char;
+                }
+            }
+            return sample;
+        }
+
+        async function registerPerson() {
+            const name = document.getElementById("name").value.trim();
+            const cpr = document.getElementById("cpr").value.trim();
+            const country = document.getElementById("country").value;
+            const employer = document.getElementById("employer").value.trim();
+            const tin_type = document.getElementById("tin_type").value.trim();
+            const start_date = document.getElementById("start_date").value.trim();
+            const end_date = document.getElementById("end_date").value.trim();
+
+            const res = await fetch("/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, cpr, country, employer, tin_type, start_date, end_date })
+            });
+
+            const data = await res.json();
+            document.getElementById("result").innerText = data.error ? data.error : `✅ Registreret ${data.name} med TIN: ${data.tin}`;
+        }
+
+        function handleEmployerMode() {
+            const mode = document.getElementById("employerMode").value;
+            document.getElementById("employer-search").style.display = mode === "see" ? "block" : "none";
+        }
+
+        async function fetchEmployees() {
+            const name = document.getElementById("employerSelect").value;
+            const res = await fetch("/employer-lookup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name })
+            });
+            const data = await res.json();
+
+            let output = "";
+            if (data.error) {
+                output = `<p style='color:red;'>${data.error}</p>`;
+            } else {
+                output = "<ul>" + data.people.map(p => `<li>${p.F_name} ${p.Surname} – ${p.TIN_value} (${p.Status})</li>`).join("") + "</ul>";
+            }
+            document.getElementById("employerResults").innerHTML = output;
+        }
+
+        async function checkTINPension() {
+            const tin = document.getElementById("pensionTIN").value.trim();
+            const country = document.getElementById("pensionCountry").value;
+
+            const res = await fetch("/pension-lookup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ tin, country })
+            });
+
+            const data = await res.json();
+            const out = document.getElementById("pensionResult");
+
+            if (data.error) {
+                out.innerHTML = `<p style='color:red;'>${data.error}</p>`;
+            } else {
+                out.innerHTML = `<p>✅ Fundet: ${data.F_name} ${data.Surname}<br>Land: ${data.Country_ID}<br>TIN-type: ${data.TIN_type}<br>Status: ${data.TIN_status}</p>`;
+            }
+        }
+
+        // TIN-Hack Game Logic
+        let playerName = "";
+        let currentCountry = "";
+        let currentPattern = "";
+        let score = 0;
+
+        function getRandomCountry() {
+            const keys = Object.keys(tinFormats);
+            const randomKey = keys[Math.floor(Math.random() * keys.length)];
+            return [randomKey, tinFormats[randomKey]];
+        }
+
+        function startTINGame() {
+            const nameInput = document.getElementById("playerName").value.trim();
+            if (!nameInput) {
+                alert("Indtast dit navn for at starte spillet.");
+                return;
+            }
+            playerName = nameInput; // global variabel
+            score = 0;
+            document.getElementById("gameArea").style.display = "block";
+            document.getElementById("saveBtn").style.display = "none";
+            document.getElementById("highscoreList").innerHTML = "";
+            nextQuestion();
+        }        
+
+        function nextQuestion() {
+            [currentCountry, currentPattern] = getRandomCountry();
+            document.getElementById("question").innerText = `Hvordan ser et TIN fra ${currentCountry} ud? Format: ${currentPattern}`;
+            document.getElementById("tinGuess").value = "";
+            document.getElementById("feedback").innerText = "";
+        }
+
+        function validateTINFormat(input, pattern) {
+            if (input.length !== pattern.length) return false;
+            for (let i = 0; i < pattern.length; i++) {
+                const p = pattern[i], c = input[i];
+                if ((p === '#' && !/[0-9]/.test(c)) ||
+                    (p === 'A' && !/[A-Z]/.test(c)) ||
+                    (p === '?' && !/[A-Za-z0-9]/.test(c)) ||
+                    ("#A?".indexOf(p) === -1 && p !== c)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function submitTINGuess() {
+            const guess = document.getElementById("tinGuess").value.trim();
+            if (validateTINFormat(guess, currentPattern)) {
+                score++;
+                document.getElementById("feedback").innerText = "🎉 Korrekt!";
+                document.getElementById("score").innerText = `Score: ${score}`;
+                nextQuestion();
+            } else {
+                const example = tinExamples[currentCountry] || "Ingen eksempel tilgængelig";
+                document.getElementById("feedback").innerHTML = `❌ Forkert!<br>
+                    Korrekt format: ${currentPattern}<br>
+                    Eksempel: <code>${example}</code>`;
+                document.getElementById("score").innerText = `Slutscore: ${score}`;
+        
+                const nameToSave = playerName || "Anonym spiller";
+                fetch("/save-score", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: nameToSave, score })
+                });
+                
+                document.getElementById("saveBtn").style.display = "inline";
+            }
+        }        
+
+        function saveScore() {
+            if (!playerName) {
+                alert("Navn ikke fundet.");
+                return;
+            }
+            fetch("/save-score", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: playerName, score })
+            }).then(res => res.json()).then(data => {
+                alert(data.message);
+            });
+        }
+
+        async function loadHighscores() {
+            const res = await fetch("/get-highscores");
+            const data = await res.json();
+        
+            const list = document.getElementById("highscoreList");
+            list.innerHTML = "";
+        
+            if (data.highscores.length === 0) {
+                list.innerHTML = "<li>Ingen scores endnu.</li>";
+                return;
+            }
+        
+            const medals = ["🥇", "🥈", "🥉", "🎖️", "🏅"];
+        
+            data.highscores.forEach((entry, index) => {
+                const li = document.createElement("li");
+                const medal = medals[index] || `${index + 1}.`;
+                li.textContent = `${medal} ${entry[0]} – ${entry[1]} point`;
+                list.appendChild(li);
+            });
+        }        
+    </script>
+</head>
+<body>
+    <h1>Velkommen til TIN Universet 🌍</h1>
+
+    <p>Hvad er din rolle i dag?</p>
+    <select id="roleSelect" onchange="showFormForRole()">
+        <option value="">-- Vælg en rolle --</option>
+        <option value="expat">🇹 Udlandsdansker</option>
+        <option value="employer">💼 Arbejdsgiver</option>
+        <option value="pension">🦃 Pensionsmedarbejder</option>
+        <option value="other">🎲 Noget helt andet</option>
+    </select>
+
+    <!-- Udlandsdansker -->
+    <div id="expat-section" class="role-section">
+        <h2>Er du flyttet til udlandet?</h2>
+        <p>Så hjælper vi dig med at få et gyldigt TIN-nummer fra dit nye land.</p>
+
+        <label for="name">Navn:</label>
+        <input type="text" id="name"><br><br>
+
+        <label for="cpr">CPR-nummer:</label>
+        <input type="text" id="cpr"><br><br>
+
+        <label for="country">Land:</label>
+        <select id="country" onchange="updateFormat()">
+            <option value="">-- Vælg land --</option>
+            {% for country in countries %}
+                <option value="{{ country }}">{{ country }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="employer">Virksomhed (arbejdsgiver):</label>
+        <input type="text" id="employer"><br><br>
+
+        <label for="tin_type">TIN-type:</label>
+        <input type="text" id="tin_type" placeholder="f.eks. SSN, ITIN, EIN"><br><br>
+
+        <label for="start_date">Startdato:</label>
+        <input type="date" id="start_date"><br><br>
+
+        <label for="end_date">Slutdato (valgfri):</label>
+        <input type="date" id="end_date"><br><br>
+
+        <div id="formatDisplay" style="font-weight: bold;"></div>
+        <div id="exampleDisplay" style="color: gray;"></div><br>
+
+        <button onclick="registerPerson()">Registrér</button>
+        <p id="result" style="margin-top: 20px;"></p>
+    </div>
+
+    <!-- Arbejdsgiver -->
+    <div id="employer-section" class="role-section">
+        <h2>Arbejdsgiver-portal</h2>
+        <p>Se dine medarbejdere og deres TIN-status.</p>
+        <div id="employer-search">
+            <label for="employerSelect">Vælg virksomhed:</label>
+            <select id="employerSelect">
+                {% for emp in employers %}
+                    <option value="{{ emp.Name }}">{{ emp.Name }}</option>
+                {% endfor %}
+            </select>
+            <button onclick="fetchEmployees()">Hent medarbejdere</button>
+            <div id="employerResults"></div>
+        </div>
+    </div>
+
+    <!-- Pensionsmedarbejder -->
+    <div id="pension-section" class="role-section">
+        <h2>Pensionskontrol</h2>
+        <p>Vælg land og indtast et TIN-nummer for at slå en person op.</p>
+
+        <label for="pensionCountry">Land:</label>
+        <select id="pensionCountry">
+            <option value="">-- Vælg land --</option>
+            {% for country in countries %}
+                <option value="{{ country }}">{{ country }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="pensionTIN">TIN:</label>
+        <input type="text" id="pensionTIN">
+        <button onclick="checkTINPension()">Tjek</button>
+
+        <div id="pensionResult" style="margin-top: 10px;"></div>
+    </div>
+
+        <!-- Eventyrer -->
+    <div id="other-section" class="role-section">
+        <h2>Eventyrer? 🤔</h2>
+        <p>Velkommen til TIN-Hack Simulator! Gæt det korrekte format for forskellige lande. Hvor mange kan du klare?</p>
+
+        <label for="playerName">Navn:</label>
+        <input type="text" id="playerName" placeholder="Indtast dit navn"><br><br>
+
+        <button onclick="startTINGame()">Start spillet</button>
+
+        <div id="gameArea" style="margin-top: 20px; display:none;">
+            <p id="question"></p>
+            <input type="text" id="tinGuess" placeholder="Indtast TIN...">
+            <button onclick="submitTINGuess()">Gæt</button>
+            <p id="feedback"></p>
+            <p id="score"></p>
+            <button onclick="saveScore()" id="saveBtn" style="display:none;">💾 Gem Highscore</button>
+            <button onclick="loadHighscores()">📈 Se Highscore</button>
+            <ul id="highscoreList"></ul>
+        </div>
+    </div>
+</body>
+</html>
