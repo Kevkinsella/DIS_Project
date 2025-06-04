@@ -1,17 +1,3 @@
-DO $$
-BEGIN
-    IF EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'testuser') THEN
-        REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM testuser;
-        REVOKE ALL PRIVILEGES ON SCHEMA public FROM testuser;
-        REVOKE ALL PRIVILEGES ON DATABASE "TINProject" FROM testuser;
-        DROP ROLE testuser;
-    END IF;
-END $$;
-
-CREATE ROLE testuser WITH LOGIN PASSWORD '123';
-
-GRANT ALL PRIVILEGES ON DATABASE "TINProject" TO testuser;
-
 DROP TABLE IF EXISTS public."People";
 DROP TABLE IF EXISTS public."Employers";
 DROP TABLE IF EXISTS public."Countries";
