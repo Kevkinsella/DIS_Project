@@ -70,6 +70,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public."Highscores" TO testuser;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE public."Employers_EmployerID_seq" TO testuser;
 
 -- Indlæs data fra CSV
-COPY public."Countries" FROM '/Users/kevinkinsella/Desktop/Project/Data/Countries.csv' DELIMITER ',' CSV HEADER;
-COPY public."Employers" FROM '/Users/kevinkinsella/Desktop/Project/Data/Employers.csv' DELIMITER ',' CSV HEADER;
-COPY public."People" FROM '/Users/kevinkinsella/Desktop/Project/Data/People.csv' DELIMITER ',' CSV HEADER;
+COPY public."Countries" FROM '/Users/kevinkinsella/Desktop/DIS_Project/Data/Countries.csv' DELIMITER ',' CSV HEADER;
+COPY public."Employers" FROM '/Users/kevinkinsella/Desktop/DIS_Project/Data/Employers.csv' DELIMITER ',' CSV HEADER;
+COPY public."People" FROM '/Users/kevinkinsella/Desktop/DIS_Project/Data/People.csv' DELIMITER ',' CSV HEADER;
