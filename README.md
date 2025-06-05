@@ -15,5 +15,5 @@ Now access the server on the url: http://127.0.0.1:5000/
 
 You can freely register people, search employers, check pensions, and save highscores on our webapp.
 
-
+We have had problems with pgAdmin, so if it doesn't work, just run it on desktop through terminal.
 (Just so you know, when you register a new dane abroad try to restart app.py, then you'll be able to see it under Employer)
