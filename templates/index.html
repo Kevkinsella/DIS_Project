@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TIN Universet 🌍</title>
+    <title>TIN Universe 🌍</title>
     <style>
         .role-section, .form-section {
             display: none;
@@ -32,7 +32,7 @@
             const format = tinFormats[country] || "";
             document.getElementById("formatDisplay").innerText = format ? `Format: ${format}` : "";
             const example = generateSampleTIN(format);
-            document.getElementById("exampleDisplay").innerText = example ? `Eksempel: ${example}` : "";
+            document.getElementById("exampleDisplay").innerText = example ? `Example: ${example}` : "";
         }
 
         function generateSampleTIN(format) {
@@ -69,7 +69,7 @@
             });
 
             const data = await res.json();
-            document.getElementById("result").innerText = data.error ? data.error : `✅ Registreret ${data.name} med TIN: ${data.tin}`;
+            document.getElementById("result").innerText = data.error ? data.error : `✅ Registered ${data.name} with TIN: ${data.tin}`;
         }
 
         function handleEmployerMode() {
@@ -111,7 +111,7 @@
             if (data.error) {
                 out.innerHTML = `<p style='color:red;'>${data.error}</p>`;
             } else {
-                out.innerHTML = `<p>✅ Fundet: ${data.F_name} ${data.Surname}<br>Land: ${data.Country_ID}<br>TIN-type: ${data.TIN_type}<br>Status: ${data.TIN_status}</p>`;
+                out.innerHTML = `<p>✅ Found: ${data.F_name} ${data.Surname}<br>Country: ${data.Country_ID}<br>TIN type: ${data.TIN_type}<br>Status: ${data.TIN_status}</p>`;
             }
         }
 
@@ -130,10 +130,10 @@
         function startTINGame() {
             const nameInput = document.getElementById("playerName").value.trim();
             if (!nameInput) {
-                alert("Indtast dit navn for at starte spillet.");
+                alert("Enter your name to start the game.");
                 return;
             }
-            playerName = nameInput; // global variabel
+            playerName = nameInput;
             score = 0;
             document.getElementById("gameArea").style.display = "block";
             document.getElementById("saveBtn").style.display = "none";
@@ -143,7 +143,7 @@
 
         function nextQuestion() {
             [currentCountry, currentPattern] = getRandomCountry();
-            document.getElementById("question").innerText = `Hvordan ser et TIN fra ${currentCountry} ud? Format: ${currentPattern}`;
+            document.getElementById("question").innerText = `What does a TIN from ${currentCountry} look like? Format: ${currentPattern}`;
             document.getElementById("tinGuess").value = "";
             document.getElementById("feedback").innerText = "";
         }
@@ -166,17 +166,17 @@
             const guess = document.getElementById("tinGuess").value.trim();
             if (validateTINFormat(guess, currentPattern)) {
                 score++;
-                document.getElementById("feedback").innerText = "🎉 Korrekt!";
+                document.getElementById("feedback").innerText = "🎉 Correct!";
                 document.getElementById("score").innerText = `Score: ${score}`;
                 nextQuestion();
             } else {
-                const example = tinExamples[currentCountry] || "Ingen eksempel tilgængelig";
-                document.getElementById("feedback").innerHTML = `❌ Forkert!<br>
-                    Korrekt format: ${currentPattern}<br>
-                    Eksempel: <code>${example}</code>`;
-                document.getElementById("score").innerText = `Slutscore: ${score}`;
+                const example = tinExamples[currentCountry] || "No example available";
+                document.getElementById("feedback").innerHTML = `❌ Incorrect!<br>
+                    Correct format: ${currentPattern}<br>
+                    Example: <code>${example}</code>`;
+                document.getElementById("score").innerText = `Final score: ${score}`;
         
-                const nameToSave = playerName || "Anonym spiller";
+                const nameToSave = playerName || "Anonymous player";
                 fetch("/save-score", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -189,7 +189,7 @@
 
         function saveScore() {
             if (!playerName) {
-                alert("Navn ikke fundet.");
+                alert("Name not found.");
                 return;
             }
             fetch("/save-score", {
@@ -209,7 +209,7 @@
             list.innerHTML = "";
         
             if (data.highscores.length === 0) {
-                list.innerHTML = "<li>Ingen scores endnu.</li>";
+                list.innerHTML = "<li>No scores yet.</li>";
                 return;
             }
         
@@ -218,86 +218,86 @@
             data.highscores.forEach((entry, index) => {
                 const li = document.createElement("li");
                 const medal = medals[index] || `${index + 1}.`;
-                li.textContent = `${medal} ${entry[0]} – ${entry[1]} point`;
+                li.textContent = `${medal} ${entry[0]} – ${entry[1]} points`;
                 list.appendChild(li);
             });
         }        
     </script>
 </head>
 <body>
-    <h1>Velkommen til TIN Universet 🌍</h1>
+    <h1>Welcome to the TIN Universe 🌍</h1>
 
-    <p>Hvad er din rolle i dag?</p>
+    <p>What is your role today?</p>
     <select id="roleSelect" onchange="showFormForRole()">
-        <option value="">-- Vælg en rolle --</option>
-        <option value="expat">🇹 Udlandsdansker</option>
-        <option value="employer">💼 Arbejdsgiver</option>
-        <option value="pension">🦃 Pensionsmedarbejder</option>
-        <option value="other">🎲 Noget helt andet</option>
+        <option value="">-- Select a role --</option>
+        <option value="expat">🇹 Expat</option>
+        <option value="employer">💼 Employer</option>
+        <option value="pension">🦃 Pension Officer</option>
+        <option value="other">🎲 Something else</option>
     </select>
 
-    <!-- Udlandsdansker -->
+    <!-- Expat -->
     <div id="expat-section" class="role-section">
-        <h2>Er du flyttet til udlandet?</h2>
-        <p>Så hjælper vi dig med at få et gyldigt TIN-nummer fra dit nye land.</p>
+        <h2>Have you moved abroad?</h2>
+        <p>We will help you obtain a valid TIN number from your new country.</p>
 
-        <label for="name">Navn:</label>
+        <label for="name">Name:</label>
         <input type="text" id="name"><br><br>
 
-        <label for="cpr">CPR-nummer:</label>
+        <label for="cpr">CPR Number:</label>
         <input type="text" id="cpr"><br><br>
 
-        <label for="country">Land:</label>
+        <label for="country">Country:</label>
         <select id="country" onchange="updateFormat()">
-            <option value="">-- Vælg land --</option>
+            <option value="">-- Select country --</option>
             {% for country in countries %}
                 <option value="{{ country }}">{{ country }}</option>
             {% endfor %}
         </select><br><br>
 
-        <label for="employer">Virksomhed (arbejdsgiver):</label>
+        <label for="employer">Company (Employer):</label>
         <input type="text" id="employer"><br><br>
 
-        <label for="tin_type">TIN-type:</label>
-        <input type="text" id="tin_type" placeholder="f.eks. SSN, ITIN, EIN"><br><br>
+        <label for="tin_type">TIN type:</label>
+        <input type="text" id="tin_type" placeholder="e.g. SSN, ITIN, EIN"><br><br>
 
-        <label for="start_date">Startdato:</label>
+        <label for="start_date">Start Date:</label>
         <input type="date" id="start_date"><br><br>
 
-        <label for="end_date">Slutdato (valgfri):</label>
+        <label for="end_date">End Date (optional):</label>
         <input type="date" id="end_date"><br><br>
 
         <div id="formatDisplay" style="font-weight: bold;"></div>
         <div id="exampleDisplay" style="color: gray;"></div><br>
 
-        <button onclick="registerPerson()">Registrér</button>
+        <button onclick="registerPerson()">Register</button>
         <p id="result" style="margin-top: 20px;"></p>
     </div>
 
-    <!-- Arbejdsgiver -->
+    <!-- Employer -->
     <div id="employer-section" class="role-section">
-        <h2>Arbejdsgiver-portal</h2>
-        <p>Se dine medarbejdere og deres TIN-status.</p>
+        <h2>Employer Portal</h2>
+        <p>See your employees and their TIN status.</p>
         <div id="employer-search">
-            <label for="employerSelect">Vælg virksomhed:</label>
+            <label for="employerSelect">Select company:</label>
             <select id="employerSelect">
                 {% for emp in employers %}
                     <option value="{{ emp.Name }}">{{ emp.Name }}</option>
                 {% endfor %}
             </select>
-            <button onclick="fetchEmployees()">Hent medarbejdere</button>
+            <button onclick="fetchEmployees()">Fetch employees</button>
             <div id="employerResults"></div>
         </div>
     </div>
 
-    <!-- Pensionsmedarbejder -->
+    <!-- Pension Officer -->
     <div id="pension-section" class="role-section">
-        <h2>Pensionskontrol</h2>
-        <p>Vælg land og indtast et TIN-nummer for at slå en person op.</p>
+        <h2>Pension Control</h2>
+        <p>Select country and enter a TIN number to lookup a person.</p>
 
-        <label for="pensionCountry">Land:</label>
+        <label for="pensionCountry">Country:</label>
         <select id="pensionCountry">
-            <option value="">-- Vælg land --</option>
+            <option value="">-- Select country --</option>
             {% for country in countries %}
                 <option value="{{ country }}">{{ country }}</option>
             {% endfor %}
@@ -305,29 +305,29 @@
 
         <label for="pensionTIN">TIN:</label>
         <input type="text" id="pensionTIN">
-        <button onclick="checkTINPension()">Tjek</button>
+        <button onclick="checkTINPension()">Check</button>
 
         <div id="pensionResult" style="margin-top: 10px;"></div>
     </div>
 
-        <!-- Eventyrer -->
+    <!-- Adventurer -->
     <div id="other-section" class="role-section">
-        <h2>Eventyrer? 🤔</h2>
-        <p>Velkommen til TIN-Hack Simulator! Gæt det korrekte format for forskellige lande. Hvor mange kan du klare?</p>
+        <h2>Adventurer? 🤔</h2>
+        <p>Welcome to TIN-Hack Simulator! Guess the correct format for different countries. How many can you handle?</p>
 
-        <label for="playerName">Navn:</label>
-        <input type="text" id="playerName" placeholder="Indtast dit navn"><br><br>
+        <label for="playerName">Name:</label>
+        <input type="text" id="playerName" placeholder="Enter your name"><br><br>
 
-        <button onclick="startTINGame()">Start spillet</button>
+        <button onclick="startTINGame()">Start game</button>
 
         <div id="gameArea" style="margin-top: 20px; display:none;">
             <p id="question"></p>
-            <input type="text" id="tinGuess" placeholder="Indtast TIN...">
-            <button onclick="submitTINGuess()">Gæt</button>
+            <input type="text" id="tinGuess" placeholder="Enter TIN...">
+            <button onclick="submitTINGuess()">Guess</button>
             <p id="feedback"></p>
             <p id="score"></p>
-            <button onclick="saveScore()" id="saveBtn" style="display:none;">💾 Gem Highscore</button>
-            <button onclick="loadHighscores()">📈 Se Highscore</button>
+            <button onclick="saveScore()" id="saveBtn" style="display:none;">💾 Save Highscore</button>
+            <button onclick="loadHighscores()">📈 View Highscores</button>
             <ul id="highscoreList"></ul>
         </div>
     </div>
