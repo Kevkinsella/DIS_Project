@@ -1,7 +1,18 @@
-DROP TABLE IF EXISTS public."People";
-DROP TABLE IF EXISTS public."Employers";
-DROP TABLE IF EXISTS public."Countries";
-DROP TABLE IF EXISTS public."Highscores";
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'testuser') THEN
+        REVOKE ALL PRIVILEGES ON DATABASE "TINProject" FROM testuser;
+        DROP ROLE testuser;
+    END IF;
+END $$;
+
+CREATE ROLE testuser WITH LOGIN PASSWORD '123';
+GRANT ALL PRIVILEGES ON DATABASE "TINProject" TO testuser;
+
+DROP TABLE IF EXISTS public."People" CASCADE;
+DROP TABLE IF EXISTS public."Employers" CASCADE;
+DROP TABLE IF EXISTS public."Countries" CASCADE;
+DROP TABLE IF EXISTS public."Highscores" CASCADE;
 
 CREATE TABLE public."Countries" (
     code VARCHAR PRIMARY KEY,
@@ -39,9 +50,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public."People" TO testuser;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public."Employers" TO testuser;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public."Countries" TO testuser;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public."Highscores" TO testuser;
-
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE public."Employers_EmployerID_seq" TO testuser;
 
-COPY public."Countries" FROM '/Users/--/Desktop/DIS_Project/Data/Countries.csv' DELIMITER ',' CSV HEADER;
-COPY public."Employers" FROM '/Users/--/Desktop/DIS_Project/Data/Employers.csv' DELIMITER ',' CSV HEADER;
-COPY public."People" FROM '/Users/--/Desktop/DIS_Project/Data/People.csv' DELIMITER ',' CSV HEADER;
+COPY public."Countries" FROM '/Users/kevinkinsella/Desktop/Project/Data/Countries.csv' DELIMITER ',' CSV HEADER;
+COPY public."Employers" FROM '/Users/kevinkinsella/Desktop/Project/Data/Employers.csv' DELIMITER ',' CSV HEADER;
+COPY public."People" FROM '/Users/kevinkinsella/Desktop/Project/Data/People.csv' DELIMITER ',' CSV HEADER;
